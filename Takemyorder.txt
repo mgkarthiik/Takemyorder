@@ -1,0 +1,83 @@
+var Alexa = require('alexa-sdk');
+
+var a=10;
+var b=20;
+var c=30;
+var d=40;
+var handlers ={
+    
+    'LaunchRequest': function() {
+        
+      this.attributes.Order = {
+        
+        'items': {
+          'A': {
+            'number': 0,
+            'Rate': a
+          },
+          'B': {
+            'number': 0,
+            'Rate': b
+          },
+          'C': {
+            'number': 0,
+            'Rate': c
+          },
+          'D':{
+              'number':0,
+              'Rate': d
+          }
+        
+        
+          
+        }
+      
+      
+    };
+    this.response.speak("Hello, Welcome to ANC. What is your order?").listen("Please tell your order");
+    this.emit(':responseReady');
+    },
+    
+    'OrderIntent' : function(attributes) {
+       
+       this.attributes.order.number = this.event.request.intent.slots.item.value;
+        
+       this.attributes.order.cost = this.event.request.intent.slots.number.value;
+      
+        
+        this.emit(':responseReady');
+    },
+  
+    
+    
+    'TheCost' : function(){
+       
+        var cost='0';
+        var number1 = this.attributes.order.number;
+        var item1=this.attributes.order.item;
+        if(item1==='A')
+         {  cost=cost+number1*a;}
+        if(item1==='B'){
+           cost=cost+number1*b;}
+        if(item1==='C'){
+           cost=cost+number1*c;}
+        if(item1==='D'){
+           cost=cost+number1*d;}
+           
+      this.attributes.order=cost;
+      this.response.speak('The cost is'+cost);
+      
+      this.emit(':responseReady'); 
+    },
+  
+};
+
+
+
+exports.handler = function(event, context,callback){
+  var alexa = Alexa.handler(event,context,callback);
+  alexa.dynamoDBTableName = 'Order';
+  alexa.registerHandlers(handlers);
+  alexa.execute();
+};
+
